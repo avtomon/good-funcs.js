@@ -1,0 +1,9 @@
+{
+    "name": "avtomon/GoodFuncs",
+    "description": "JavaScript Function Library",
+    "type": "project",
+    "minimum-stability": "stable",
+    "config": {
+	      "process-timeout": 1800
+    }
+}
