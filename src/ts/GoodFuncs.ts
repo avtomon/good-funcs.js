@@ -15,7 +15,7 @@ module Utils {
     type SiblingsType = 'all' | 'prev' | 'next';
 
     /**
-     * Полезные функции js
+     * Полезные функции JavaScript и TypeScript
      */
     export class GoodFuncs {
 

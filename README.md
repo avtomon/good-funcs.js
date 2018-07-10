@@ -1,8 +1,9 @@
-## GoodFuncs
+<a name="GoodFuncs"></a>
 
+## GoodFuncs
 Полезные функции JavaScript и TypeScript
 
-**Тип**: global class  
+**Kind**: global class  
 
 * [GoodFuncs](#GoodFuncs)
     * [.getScripts(paths, type)](#GoodFuncs.getScripts)

@@ -2,7 +2,7 @@
 var Utils;
 (function (Utils) {
     /**
-     * Полезные функции js
+     * Полезные функции JavaScript и TypeScript
      */
     class GoodFuncs {
         /**
