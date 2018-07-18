@@ -7,6 +7,7 @@ Useful features of TypeScript and JavaScript.
 `
 composer reqire avtomon/goodfuncs.js
 `
+
 <br>
 
 <b > note:</b> 

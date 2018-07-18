@@ -7,6 +7,7 @@
 ``
 composer reqire avtomon/goodfuncs.js
 ``
+
 <br>
 
 <b>Примечание:</b> 
