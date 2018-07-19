@@ -4,7 +4,7 @@ var Utils;
     /**
      * Полезные функции JavaScript и TypeScript
      */
-    export class GoodFuncs {
+    class GoodFuncs {
         /**
          * Добаление скриптов на страницу
          *
