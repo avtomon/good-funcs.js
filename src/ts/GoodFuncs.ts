@@ -1,8 +1,8 @@
 "use strict";
 
-import FormElement = Templater.FormElement;
+import {Templater} from '../../../ApplyAjax.js/dist/ApplyAjax.js';
 
-module Utils {
+export namespace Utils {
 
     /**
      * Тип объекта атрибутов HTML-элемента
@@ -51,6 +51,15 @@ module Utils {
 
             let element: HTMLElement = document.createElement(tagName);
             for (let attr in attrs) {
+                if (attr === 'text') {
+                    element.innerText = attrs[attr] as string;
+                    continue;
+                }
+                if (attr === 'html') {
+                    element.innerHTML = attrs[attr] as string;
+                    continue;
+                }
+
                 element.setAttribute(attr, attrs[attr] as string);
             }
 
@@ -88,7 +97,7 @@ module Utils {
          *
          * @returns {HTMLElement[]}
          */
-        static siblings(element: HTMLElement, filter: string, type: SiblingsType = 'all'): HTMLElement[] {
+        static siblings(element: HTMLElement, filter: string = '', type: SiblingsType = 'all'): HTMLElement[] {
 
             let ok: boolean = type === 'prev',
                 parent = element.parentNode as HTMLElement,
@@ -152,8 +161,8 @@ module Utils {
          */
         static checkEmptyVal(): boolean {
 
-            for (let element of document.querySelectorAll('input:requred, select:required, textarea:required')) {
-                if (!(element as FormElement).value) {
+            for (let element of document.querySelectorAll('input:required, select:required, textarea:required')) {
+                if ((element as Templater.FormElement).value === '') {
                     return false;
                 }
             }

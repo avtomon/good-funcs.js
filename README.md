@@ -1,6 +1,6 @@
 ## GoodFuncs
 
-Useful functions for TypeScript and JavaScript.
+Useful features of TypeScript and JavaScript.
 
 #### Installation
 
@@ -15,4 +15,4 @@ If you plan to develop the project yourself and build it with the <I>script buil
 
 <br>
 
-[Methods documentation](docs_ru)
+[Method documentation](docs_ru)

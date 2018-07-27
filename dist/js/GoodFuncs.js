@@ -1,5 +1,5 @@
 "use strict";
-var Utils;
+export var Utils;
 (function (Utils) {
     /**
      * Полезные функции JavaScript и TypeScript
@@ -34,6 +34,14 @@ var Utils;
         static createElementWithAttrs(tagName, attrs) {
             let element = document.createElement(tagName);
             for (let attr in attrs) {
+                if (attr === 'text') {
+                    element.innerText = attrs[attr];
+                    continue;
+                }
+                if (attr === 'html') {
+                    element.innerHTML = attrs[attr];
+                    continue;
+                }
                 element.setAttribute(attr, attrs[attr]);
             }
             return element;
@@ -66,7 +74,7 @@ var Utils;
          *
          * @returns {HTMLElement[]}
          */
-        static siblings(element, filter, type = 'all') {
+        static siblings(element, filter = '', type = 'all') {
             let ok = type === 'prev', parent = element.parentNode, siblings = (filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter)));
             return siblings.filter(function (child) {
                 switch (type) {
@@ -118,8 +126,8 @@ var Utils;
          * @returns {boolean}
          */
         static checkEmptyVal() {
-            for (let element of document.querySelectorAll('input:requred, select:required, textarea:required')) {
-                if (!element.value) {
+            for (let element of document.querySelectorAll('input:required, select:required, textarea:required')) {
+                if (element.value === '') {
                     return false;
                 }
             }
