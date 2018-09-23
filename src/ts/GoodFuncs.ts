@@ -1,13 +1,13 @@
 "use strict";
 
-import {Templater} from '../../../ApplyAjax.js/dist/ApplyAjax.js';
+import {Templater} from '../../../ApplyAjax.js/dist/js/ApplyAjax.js';
 
 export namespace Utils {
 
     /**
      * Тип объекта атрибутов HTML-элемента
      */
-    export type Attrs = { [prop: string]: string | number };
+    export type Attrs = { [prop: string]: string | number | boolean };
 
     /**
      * Тип соседства HTML-элементов
@@ -23,19 +23,58 @@ export namespace Utils {
          * Добаление скриптов на страницу
          *
          * @param {string[]} paths - массив путей к скриптам
-         * @param {"sync" | "defer" | "async"} type
+         * @param {Attr} attrs - атрибуты
+         *
+         * @returns {Promise<void>[]}
          */
-        static getScripts(paths: string[], type: 'sync' | 'defer' | 'async' = 'sync'): void {
+        static getScripts(paths: string[], attrs: Attrs = {}): Promise<void>[] {
 
-            Array.from(document.scripts).forEach(function (script) {
-                let scriptIndex = paths.indexOf(script.src);
-                if (scriptIndex !== -1) {
-                    delete paths[scriptIndex];
+            let scriptElements: HTMLScriptElement[] = Array.from(document.getElementsByTagName('script')),
+                scriptCount: number = scriptElements.length,
+                lastScript: HTMLScriptElement = scriptElements[scriptCount - 2];
+
+            let promises: Promise<void>[] = [];
+            paths.forEach(function (script, index) {
+                if (document.querySelector(`script[src="${script}"]`)){
+                    return;
                 }
+
+                promises[index] = new Promise<void>(function (resolve) {
+                    attrs['src'] = script;
+                    let scriptElement: HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
+                    lastScript.after(scriptElement);
+                    lastScript = scriptElement;
+                    scriptElement.onload = scriptElement.onreadystatechange = function () {
+                        resolve();
+                    }
+                });
             });
 
-            paths.forEach(function (script) {
-                document.body.insertAdjacentHTML('beforeend', `<script src="${script}"></script>`)
+            return promises;
+        };
+
+        /**
+         * Добавление файлов стилей
+         *
+         * @param {string[]} paths - массив путей к файлам стилей
+         * @param {Utils.Attrs} attrs - атрибуты
+         */
+        static addCss(paths: string[], attrs: Attrs = {}): void {
+
+            let cssElements: HTMLLinkElement[] = Array.from(document.querySelectorAll('link[rel="stylesheet"]')),
+                scriptCount: number = cssElements.length,
+                lastCss: HTMLLinkElement = cssElements[scriptCount - 2];
+
+            paths.forEach(function (css) {
+                if (document.querySelector(`link[href="${css}"]`)){
+                    return;
+                }
+
+                attrs['href'] = css;
+                attrs['rel'] = 'stylesheet';
+                let cssElement: HTMLLinkElement = GoodFuncs.createElementWithAttrs('link', attrs) as HTMLLinkElement;
+                lastCss.after(cssElement);
+                lastCss = cssElement;
             });
         };
 
@@ -51,10 +90,15 @@ export namespace Utils {
 
             let element: HTMLElement = document.createElement(tagName);
             for (let attr in attrs) {
+                if (!attr) {
+                    continue;
+                }
+
                 if (attr === 'text') {
                     element.innerText = attrs[attr] as string;
                     continue;
                 }
+
                 if (attr === 'html') {
                     element.innerHTML = attrs[attr] as string;
                     continue;
@@ -66,6 +110,7 @@ export namespace Utils {
             return element;
         };
 
+
         /**
          * Вернуть делегированный элемент по селектору
          *
@@ -76,7 +121,8 @@ export namespace Utils {
          */
         static getDelegateTarget(event: Event, selector: string): HTMLElement | null {
 
-            let child = (event.target as HTMLElement).closest(selector);
+            let target = event.target as HTMLElement,
+                child = target.closest ? target.closest(selector) : null;
             if (!child) {
                 return null;
             }
@@ -101,7 +147,7 @@ export namespace Utils {
 
             let ok: boolean = type === 'prev',
                 parent = element.parentNode as HTMLElement,
-                siblings: HTMLElement[] = (filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter))) as HTMLElement[];
+                siblings: HTMLElement[] = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter))) as HTMLElement[];
 
             return siblings.filter(function (child) {
 
@@ -159,9 +205,9 @@ export namespace Utils {
          *
          * @returns {boolean}
          */
-        static checkEmptyVal(): boolean {
+        static checkEmptyVal(parent: HTMLElement | Document = document): boolean {
 
-            for (let element of document.querySelectorAll('input:required, select:required, textarea:required')) {
+            for (let element of parent.querySelectorAll('input:required, select:required, textarea:required')) {
                 if ((element as Templater.FormElement).value === '') {
                     return false;
                 }
@@ -202,7 +248,7 @@ export namespace Utils {
                 return false;
             }
 
-            let styleSheet: CSSStyleSheet = GoodFuncs.getStyleSheet(styleSheetName);
+            let styleSheet: CSSStyleSheet | null = GoodFuncs.getStyleSheet(styleSheetName);
 
             if (!styleSheet) {
                 return false;
@@ -229,7 +275,7 @@ export namespace Utils {
                 return null;
             }
 
-            let styleSheet: CSSStyleSheet = GoodFuncs.getStyleSheet(styleSheetName);
+            let styleSheet: CSSStyleSheet | null = GoodFuncs.getStyleSheet(styleSheetName);
 
             if (!styleSheet) {
                 return null;
@@ -240,7 +286,15 @@ export namespace Utils {
             return styleSheet.insertRule(`${selector} { ${ruleStr} }`, styleNumber);
         };
 
-        static pseudo(styleSheet: string, selector: string): (rules: Attrs) => number {
+        /**
+         * Вернуть функцию добавления заданных правил
+         *
+         * @param {string} styleSheet - имя файла таблицы стилей
+         * @param {string} selector - селектор
+         *
+         * @returns {(rules: Utils.Attrs) => number}
+         */
+        static pseudo(styleSheet: string, selector: string): (rules: Attrs) => number | null {
 
             return function (rules: Attrs) {
                 return GoodFuncs.insertStyleRule(styleSheet, selector, rules);
@@ -257,7 +311,11 @@ export namespace Utils {
          */
         static index(element: HTMLElement, selector: string = ''): number {
 
-            let children: HTMLElement[] = Array.from(element.parentElement.children) as HTMLElement[];
+            let children: HTMLElement[] = element.parentElement ? Array.from(element.parentElement.children) as HTMLElement[] : [];
+
+            if (!children.length) {
+                return -1;
+            }
 
             if (selector) {
                 children = children.filter(function (item) {
@@ -285,11 +343,15 @@ export namespace Utils {
         static prev(element: HTMLElement, selector: string): HTMLElement | null {
 
             let prev = element.previousElementSibling;
-            while (!prev.matches(selector)) {
+            while (prev) {
+                if (prev.matches(selector)) {
+                    return prev as HTMLElement;
+                }
+
                 prev = prev.previousElementSibling;
             }
 
-            return prev as HTMLElement;
+            return null;
         }
 
         /**
@@ -303,11 +365,15 @@ export namespace Utils {
         static next(element: HTMLElement, selector: string): HTMLElement | null {
 
             let next = element.nextElementSibling;
-            while (!next.matches(selector)) {
+            while (next) {
+                if (next.matches(selector)) {
+                    return next as HTMLElement;
+                }
+
                 next = next.nextElementSibling;
             }
 
-            return next as HTMLElement;
+            return null;
         }
 
         /**
@@ -319,7 +385,7 @@ export namespace Utils {
          */
         static getRandomString(symbolCount: number): string {
 
-            return Math.random().toString(36).substring(symbolCount);
+            return Math.random().toString(36).substring(2, symbolCount);
         }
 
         /**
@@ -333,6 +399,47 @@ export namespace Utils {
             Object.keys(attribites).forEach(function (name: string) {
                 element.setAttribute(name, attribites[name] as string);
             })
+        }
+
+        /**
+         * Переключение свойств HTML-элементов
+         *
+         * @param {HTMLElement} element - элемент
+         * @param {string} prop - имя свойства
+         */
+        static toggleProp(element: HTMLElement, prop: string): void {
+
+            let value: boolean = Boolean(element[prop]);
+
+            element[prop] = !value;
+        }
+
+        /**
+         * Отфильтровать массив элементов по селектору
+         *
+         * @param {HTMLElement[]} elements - набор елементов
+         * @param {string} selector - селектор
+         *
+         * @returns {HTMLElement[]}
+         */
+        static filter(elements: HTMLElement[], selector: string): HTMLElement[] {
+
+            return elements.filter(function (element) {
+
+                return element.matches(selector);
+            })
+        }
+
+        /**
+         * Видим ли элемент
+         *
+         * @param {HTMLElement} element - проверяемый элемент
+         * @param {boolean} strict - использовать строгий режим
+         * ы
+         * @returns {boolean}
+         */
+        static isVisible(element: HTMLElement, strict: boolean = false): boolean {
+            return strict ? window.getComputedStyle(element).display !== 'none' : element.offsetParent !== null;
         }
     }
 }
