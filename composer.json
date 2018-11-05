@@ -1,8 +1,4 @@
 {
-    "name": "avtomon/GoodFuncs.js",
-    "description": "JavaScript Function Library",
-    "minimum-stability": "dev",
-    "config": {
-	      "process-timeout": 1800
-    }
+    "name": "avtomon/good-funcs.js",
+    "description": "JavaScript Function Library"
 }
