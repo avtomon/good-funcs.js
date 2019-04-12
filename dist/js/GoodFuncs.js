@@ -17,10 +17,11 @@ export var Utils;
             let scriptElements = Array.from(document.getElementsByTagName('script')), scriptCount = scriptElements.length, lastScript = scriptElements[scriptCount - 2];
             let promises = [];
             paths.forEach(function (script, index) {
-                if (document.querySelector(`script[src="${script}"]`)) {
-                    return;
-                }
                 promises[index] = new Promise(function (resolve) {
+                    if (document.querySelector(`script[src="${script}"]`)) {
+                        resolve();
+                        return;
+                    }
                     attrs['src'] = script;
                     let scriptElement = GoodFuncs.createElementWithAttrs('script', attrs);
                     lastScript.after(scriptElement);
@@ -357,3 +358,4 @@ export var Utils;
     }
     Utils.GoodFuncs = GoodFuncs;
 })(Utils || (Utils = {}));
+//# sourceMappingURL=GoodFuncs.js.map

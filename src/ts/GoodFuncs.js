@@ -1,5 +1,5 @@
 "use strict";
-var Utils;
+export var Utils;
 (function (Utils) {
     /**
      * Полезные функции JavaScript и TypeScript
@@ -9,17 +9,48 @@ var Utils;
          * Добаление скриптов на страницу
          *
          * @param {string[]} paths - массив путей к скриптам
-         * @param {"sync" | "defer" | "async"} type
+         * @param {Attr} attrs - атрибуты
+         *
+         * @returns {Promise<void>[]}
          */
-        static getScripts(paths, type = 'sync') {
-            Array.from(document.scripts).forEach(function (script) {
-                let scriptIndex = paths.indexOf(script.src);
-                if (scriptIndex !== -1) {
-                    delete paths[scriptIndex];
-                }
+        static getScripts(paths, attrs = {}) {
+            let scriptElements = Array.from(document.getElementsByTagName('script')), scriptCount = scriptElements.length, lastScript = scriptElements[scriptCount - 2];
+            let promises = [];
+            paths.forEach(function (script, index) {
+                promises[index] = new Promise(function (resolve) {
+                    if (document.querySelector(`script[src="${script}"]`)) {
+                        resolve();
+                        return;
+                    }
+                    attrs['src'] = script;
+                    let scriptElement = GoodFuncs.createElementWithAttrs('script', attrs);
+                    lastScript.after(scriptElement);
+                    lastScript = scriptElement;
+                    scriptElement.onload = scriptElement.onreadystatechange = function () {
+                        resolve();
+                    };
+                });
             });
-            paths.forEach(function (script) {
-                document.body.insertAdjacentHTML('beforeend', `<script src="${script}"></script>`);
+            return promises;
+        }
+        ;
+        /**
+         * Добавление файлов стилей
+         *
+         * @param {string[]} paths - массив путей к файлам стилей
+         * @param {Utils.Attrs} attrs - атрибуты
+         */
+        static addCss(paths, attrs = {}) {
+            let cssElements = Array.from(document.querySelectorAll('link[rel="stylesheet"]')), scriptCount = cssElements.length, lastCss = cssElements[scriptCount - 2];
+            paths.forEach(function (css) {
+                if (document.querySelector(`link[href="${css}"]`)) {
+                    return;
+                }
+                attrs['href'] = css;
+                attrs['rel'] = 'stylesheet';
+                let cssElement = GoodFuncs.createElementWithAttrs('link', attrs);
+                lastCss.after(cssElement);
+                lastCss = cssElement;
             });
         }
         ;
@@ -34,6 +65,17 @@ var Utils;
         static createElementWithAttrs(tagName, attrs) {
             let element = document.createElement(tagName);
             for (let attr in attrs) {
+                if (!attr) {
+                    continue;
+                }
+                if (attr === 'text') {
+                    element.innerText = attrs[attr];
+                    continue;
+                }
+                if (attr === 'html') {
+                    element.innerHTML = attrs[attr];
+                    continue;
+                }
                 element.setAttribute(attr, attrs[attr]);
             }
             return element;
@@ -48,7 +90,7 @@ var Utils;
          * @returns {HTMLElement | null}
          */
         static getDelegateTarget(event, selector) {
-            let child = event.target.closest(selector);
+            let target = event.target, child = target.closest ? target.closest(selector) : null;
             if (!child) {
                 return null;
             }
@@ -66,8 +108,8 @@ var Utils;
          *
          * @returns {HTMLElement[]}
          */
-        static siblings(element, filter, type = 'all') {
-            let ok = type === 'prev', parent = element.parentNode, siblings = (filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter)));
+        static siblings(element, filter = '', type = 'all') {
+            let ok = type === 'prev', parent = element.parentNode, siblings = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter)));
             return siblings.filter(function (child) {
                 switch (type) {
                     case 'all':
@@ -117,9 +159,9 @@ var Utils;
          *
          * @returns {boolean}
          */
-        static checkEmptyVal() {
-            for (let element of document.querySelectorAll('input:requred, select:required, textarea:required')) {
-                if (!element.value) {
+        static checkEmptyVal(parent = document) {
+            for (let element of parent.querySelectorAll('input:required, select:required, textarea:required')) {
+                if (element.value === '') {
                     return false;
                 }
             }
@@ -183,6 +225,14 @@ var Utils;
             return styleSheet.insertRule(`${selector} { ${ruleStr} }`, styleNumber);
         }
         ;
+        /**
+         * Вернуть функцию добавления заданных правил
+         *
+         * @param {string} styleSheet - имя файла таблицы стилей
+         * @param {string} selector - селектор
+         *
+         * @returns {(rules: Utils.Attrs) => number}
+         */
         static pseudo(styleSheet, selector) {
             return function (rules) {
                 return GoodFuncs.insertStyleRule(styleSheet, selector, rules);
@@ -198,7 +248,10 @@ var Utils;
          * @returns {number}
          */
         static index(element, selector = '') {
-            let children = Array.from(element.parentElement.children);
+            let children = element.parentElement ? Array.from(element.parentElement.children) : [];
+            if (!children.length) {
+                return -1;
+            }
             if (selector) {
                 children = children.filter(function (item) {
                     return item.matches(selector);
@@ -221,10 +274,13 @@ var Utils;
          */
         static prev(element, selector) {
             let prev = element.previousElementSibling;
-            while (!prev.matches(selector)) {
+            while (prev) {
+                if (prev.matches(selector)) {
+                    return prev;
+                }
                 prev = prev.previousElementSibling;
             }
-            return prev;
+            return null;
         }
         /**
          * Следующий элемент среди соседей, соответствующий селектору
@@ -236,10 +292,13 @@ var Utils;
          */
         static next(element, selector) {
             let next = element.nextElementSibling;
-            while (!next.matches(selector)) {
+            while (next) {
+                if (next.matches(selector)) {
+                    return next;
+                }
                 next = next.nextElementSibling;
             }
-            return next;
+            return null;
         }
         /**
          * Случайная строка заданной длины
@@ -249,7 +308,7 @@ var Utils;
          * @returns {string}
          */
         static getRandomString(symbolCount) {
-            return Math.random().toString(36).substring(symbolCount);
+            return Math.random().toString(36).substring(2, symbolCount);
         }
         /**
          * Массовая установка атрибутов элемента
@@ -261,6 +320,40 @@ var Utils;
             Object.keys(attribites).forEach(function (name) {
                 element.setAttribute(name, attribites[name]);
             });
+        }
+        /**
+         * Переключение свойств HTML-элементов
+         *
+         * @param {HTMLElement} element - элемент
+         * @param {string} prop - имя свойства
+         */
+        static toggleProp(element, prop) {
+            let value = Boolean(element[prop]);
+            element[prop] = !value;
+        }
+        /**
+         * Отфильтровать массив элементов по селектору
+         *
+         * @param {HTMLElement[]} elements - набор елементов
+         * @param {string} selector - селектор
+         *
+         * @returns {HTMLElement[]}
+         */
+        static filter(elements, selector) {
+            return elements.filter(function (element) {
+                return element.matches(selector);
+            });
+        }
+        /**
+         * Видим ли элемент
+         *
+         * @param {HTMLElement} element - проверяемый элемент
+         * @param {boolean} strict - использовать строгий режим
+         * ы
+         * @returns {boolean}
+         */
+        static isVisible(element, strict = false) {
+            return strict ? window.getComputedStyle(element).display !== 'none' : element.offsetParent !== null;
         }
     }
     Utils.GoodFuncs = GoodFuncs;

@@ -1,13 +1,13 @@
 "use strict";
 
-import {Templater} from '../../../ApplyAjax.js/dist/js/ApplyAjax.js';
+import {Templater} from '../../../apply-ajax.js/dist/js/ApplyAjax.js';
 
 export namespace Utils {
 
     /**
      * Тип объекта атрибутов HTML-элемента
      */
-    export type Attrs = { [prop: string]: string | number | boolean };
+    export type Attrs = { [prop : string] : string | number | boolean };
 
     /**
      * Тип соседства HTML-элементов
@@ -27,21 +27,23 @@ export namespace Utils {
          *
          * @returns {Promise<void>[]}
          */
-        static getScripts(paths: string[], attrs: Attrs = {}): Promise<void>[] {
+        static getScripts(paths : string[], attrs : Attrs = {}) : Promise<void>[] {
 
-            let scriptElements: HTMLScriptElement[] = Array.from(document.getElementsByTagName('script')),
-                scriptCount: number = scriptElements.length,
-                lastScript: HTMLScriptElement = scriptElements[scriptCount - 2];
+            let scriptElements : HTMLScriptElement[] = Array.from(document.getElementsByTagName('script')),
+                scriptCount : number = scriptElements.length,
+                lastScript : HTMLScriptElement = scriptElements[scriptCount - 2];
 
-            let promises: Promise<void>[] = [];
+            let promises : Promise<void>[] = [];
             paths.forEach(function (script, index) {
-                if (document.querySelector(`script[src="${script}"]`)){
-                    return;
-                }
-
                 promises[index] = new Promise<void>(function (resolve) {
+
+                    if (document.querySelector(`script[src="${script}"]`)) {
+                        resolve();
+                        return;
+                    }
+
                     attrs['src'] = script;
-                    let scriptElement: HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
+                    let scriptElement : HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
                     lastScript.after(scriptElement);
                     lastScript = scriptElement;
                     scriptElement.onload = scriptElement.onreadystatechange = function () {
@@ -59,20 +61,20 @@ export namespace Utils {
          * @param {string[]} paths - массив путей к файлам стилей
          * @param {Utils.Attrs} attrs - атрибуты
          */
-        static addCss(paths: string[], attrs: Attrs = {}): void {
+        static addCss(paths : string[], attrs : Attrs = {}) : void {
 
-            let cssElements: HTMLLinkElement[] = Array.from(document.querySelectorAll('link[rel="stylesheet"]')),
-                scriptCount: number = cssElements.length,
-                lastCss: HTMLLinkElement = cssElements[scriptCount - 2];
+            let cssElements : HTMLLinkElement[] = Array.from(document.querySelectorAll('link[rel="stylesheet"]')),
+                scriptCount : number = cssElements.length,
+                lastCss : HTMLLinkElement = cssElements[scriptCount - 2];
 
             paths.forEach(function (css) {
-                if (document.querySelector(`link[href="${css}"]`)){
+                if (document.querySelector(`link[href="${css}"]`)) {
                     return;
                 }
 
                 attrs['href'] = css;
                 attrs['rel'] = 'stylesheet';
-                let cssElement: HTMLLinkElement = GoodFuncs.createElementWithAttrs('link', attrs) as HTMLLinkElement;
+                let cssElement : HTMLLinkElement = GoodFuncs.createElementWithAttrs('link', attrs) as HTMLLinkElement;
                 lastCss.after(cssElement);
                 lastCss = cssElement;
             });
@@ -86,9 +88,9 @@ export namespace Utils {
          *
          * @returns {HTMLElement}
          */
-        static createElementWithAttrs(tagName: string, attrs: Attrs): HTMLElement {
+        static createElementWithAttrs(tagName : string, attrs : Attrs) : HTMLElement {
 
-            let element: HTMLElement = document.createElement(tagName);
+            let element : HTMLElement = document.createElement(tagName);
             for (let attr in attrs) {
                 if (!attr) {
                     continue;
@@ -119,7 +121,7 @@ export namespace Utils {
          *
          * @returns {HTMLElement | null}
          */
-        static getDelegateTarget(event: Event, selector: string): HTMLElement | null {
+        static getDelegateTarget(event : Event, selector : string) : HTMLElement | null {
 
             let target = event.target as HTMLElement,
                 child = target.closest ? target.closest(selector) : null;
@@ -143,11 +145,11 @@ export namespace Utils {
          *
          * @returns {HTMLElement[]}
          */
-        static siblings(element: HTMLElement, filter: string = '', type: SiblingsType = 'all'): HTMLElement[] {
+        static siblings(element : HTMLElement, filter : string = '', type : SiblingsType = 'all') : HTMLElement[] {
 
-            let ok: boolean = type === 'prev',
+            let ok : boolean = type === 'prev',
                 parent = element.parentNode as HTMLElement,
-                siblings: HTMLElement[] = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter))) as HTMLElement[];
+                siblings : HTMLElement[] = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter))) as HTMLElement[];
 
             return siblings.filter(function (child) {
 
@@ -184,7 +186,7 @@ export namespace Utils {
          *
          * @returns {HTMLElement[]}
          */
-        static prevAll(element: HTMLElement, filter: string): HTMLElement[] {
+        static prevAll(element : HTMLElement, filter : string) : HTMLElement[] {
             return GoodFuncs.siblings(element, filter, 'prev');
         };
 
@@ -196,7 +198,7 @@ export namespace Utils {
          *
          * @returns {HTMLElement[]}
          */
-        static nextAll(element: HTMLElement, filter: string): HTMLElement[] {
+        static nextAll(element : HTMLElement, filter : string) : HTMLElement[] {
             return GoodFuncs.siblings(element, filter, 'next');
         };
 
@@ -205,7 +207,7 @@ export namespace Utils {
          *
          * @returns {boolean}
          */
-        static checkEmptyVal(parent: HTMLElement | Document = document): boolean {
+        static checkEmptyVal(parent : HTMLElement | Document = document) : boolean {
 
             for (let element of parent.querySelectorAll('input:required, select:required, textarea:required')) {
                 if ((element as Templater.FormElement).value === '') {
@@ -223,7 +225,7 @@ export namespace Utils {
          *
          * @returns {CSSStyleSheet | null}
          */
-        static getStyleSheet(styleSheetName: string): CSSStyleSheet | null {
+        static getStyleSheet(styleSheetName : string) : CSSStyleSheet | null {
 
             for (let sheet of Array.from(document.styleSheets)) {
                 if (sheet.href && sheet.href.indexOf(styleSheetName) !== -1) {
@@ -242,13 +244,13 @@ export namespace Utils {
          *
          * @returns {boolean}
          */
-        static removeStyleRule(styleSheetName: string, styleNumber: number): boolean {
+        static removeStyleRule(styleSheetName : string, styleNumber : number) : boolean {
 
             if (!styleSheetName || styleNumber === undefined) {
                 return false;
             }
 
-            let styleSheet: CSSStyleSheet | null = GoodFuncs.getStyleSheet(styleSheetName);
+            let styleSheet : CSSStyleSheet | null = GoodFuncs.getStyleSheet(styleSheetName);
 
             if (!styleSheet) {
                 return false;
@@ -269,13 +271,13 @@ export namespace Utils {
          *
          * @returns {number | null}
          */
-        static insertStyleRule(styleSheetName: string, selector: string, rules: Attrs, styleNumber?: number): number | null {
+        static insertStyleRule(styleSheetName : string, selector : string, rules : Attrs, styleNumber? : number) : number | null {
 
             if (!styleSheetName || !selector || !rules) {
                 return null;
             }
 
-            let styleSheet: CSSStyleSheet | null = GoodFuncs.getStyleSheet(styleSheetName);
+            let styleSheet : CSSStyleSheet | null = GoodFuncs.getStyleSheet(styleSheetName);
 
             if (!styleSheet) {
                 return null;
@@ -294,9 +296,9 @@ export namespace Utils {
          *
          * @returns {(rules: Utils.Attrs) => number}
          */
-        static pseudo(styleSheet: string, selector: string): (rules: Attrs) => number | null {
+        static pseudo(styleSheet : string, selector : string) : (rules : Attrs) => number | null {
 
-            return function (rules: Attrs) {
+            return function (rules : Attrs) {
                 return GoodFuncs.insertStyleRule(styleSheet, selector, rules);
             };
         };
@@ -309,9 +311,9 @@ export namespace Utils {
          *
          * @returns {number}
          */
-        static index(element: HTMLElement, selector: string = ''): number {
+        static index(element : HTMLElement, selector : string = '') : number {
 
-            let children: HTMLElement[] = element.parentElement ? Array.from(element.parentElement.children) as HTMLElement[] : [];
+            let children : HTMLElement[] = element.parentElement ? Array.from(element.parentElement.children) as HTMLElement[] : [];
 
             if (!children.length) {
                 return -1;
@@ -340,7 +342,7 @@ export namespace Utils {
          *
          * @returns {HTMLElement | null}
          */
-        static prev(element: HTMLElement, selector: string): HTMLElement | null {
+        static prev(element : HTMLElement, selector : string) : HTMLElement | null {
 
             let prev = element.previousElementSibling;
             while (prev) {
@@ -362,7 +364,7 @@ export namespace Utils {
          *
          * @returns {HTMLElement | null}
          */
-        static next(element: HTMLElement, selector: string): HTMLElement | null {
+        static next(element : HTMLElement, selector : string) : HTMLElement | null {
 
             let next = element.nextElementSibling;
             while (next) {
@@ -383,7 +385,7 @@ export namespace Utils {
          *
          * @returns {string}
          */
-        static getRandomString(symbolCount: number): string {
+        static getRandomString(symbolCount : number) : string {
 
             return Math.random().toString(36).substring(2, symbolCount);
         }
@@ -394,9 +396,9 @@ export namespace Utils {
          * @param {HTMLElement} element - элемент
          * @param {Utils.Attrs} attribites - объект атрибутов
          */
-        static setAttributes(element: HTMLElement, attribites: Attrs): void {
+        static setAttributes(element : HTMLElement, attribites : Attrs) : void {
 
-            Object.keys(attribites).forEach(function (name: string) {
+            Object.keys(attribites).forEach(function (name : string) {
                 element.setAttribute(name, attribites[name] as string);
             })
         }
@@ -407,9 +409,9 @@ export namespace Utils {
          * @param {HTMLElement} element - элемент
          * @param {string} prop - имя свойства
          */
-        static toggleProp(element: HTMLElement, prop: string): void {
+        static toggleProp(element : HTMLElement, prop : string) : void {
 
-            let value: boolean = Boolean(element[prop]);
+            let value : boolean = Boolean(element[prop]);
 
             element[prop] = !value;
         }
@@ -422,7 +424,7 @@ export namespace Utils {
          *
          * @returns {HTMLElement[]}
          */
-        static filter(elements: HTMLElement[], selector: string): HTMLElement[] {
+        static filter(elements : HTMLElement[], selector : string) : HTMLElement[] {
 
             return elements.filter(function (element) {
 
@@ -438,7 +440,7 @@ export namespace Utils {
          * ы
          * @returns {boolean}
          */
-        static isVisible(element: HTMLElement, strict: boolean = false): boolean {
+        static isVisible(element : HTMLElement, strict : boolean = false) : boolean {
             return strict ? window.getComputedStyle(element).display !== 'none' : element.offsetParent !== null;
         }
     }
