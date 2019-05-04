@@ -46,9 +46,20 @@ export namespace Utils {
                     let scriptElement : HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
                     lastScript.after(scriptElement);
                     lastScript = scriptElement;
-                    scriptElement.onload = scriptElement.onreadystatechange = function () {
-                        resolve();
-                    }
+                    scriptElement.onload = function() {
+                        if (!this.executed) { // выполнится только один раз
+                            this.executed = true;
+                            resolve();
+                        }
+                    };
+
+                    scriptElement.onreadystatechange = function() {
+                        if (this.readyState === 'complete' || this.readyState === 'loaded') {
+                            setTimeout(function() {
+                                this.onload()
+                            }.bind(this), 0); // сохранить "this" для onload
+                        }
+                    };
                 });
             });
 
