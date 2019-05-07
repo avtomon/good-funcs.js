@@ -51,7 +51,7 @@ export var Utils;
          * @param {Utils.Attrs} attrs - атрибуты
          */
         static addCss(paths, attrs = {}) {
-            let cssElements = Array.from(document.querySelectorAll('link[rel="stylesheet"]')), scriptCount = cssElements.length, lastCss = cssElements[scriptCount - 2];
+            let cssElements = Array.from(document.querySelectorAll('link[rel="stylesheet"]')), cssCount = cssElements.length, lastCss = cssElements[cssCount - 1];
             paths.forEach(function (css) {
                 if (document.querySelector(`link[href="${css}"]`)) {
                     return;
@@ -119,7 +119,9 @@ export var Utils;
          * @returns {HTMLElement[]}
          */
         static siblings(element, filter = '', type = 'all') {
-            let ok = type === 'prev', parent = element.parentNode, siblings = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter)));
+            let ok = type === 'prev', parent = element.parentNode, siblings = (!filter
+                ? Array.from(parent.children)
+                : Array.from(parent.querySelectorAll(filter)));
             return siblings.filter(function (child) {
                 switch (type) {
                     case 'all':
@@ -324,11 +326,11 @@ export var Utils;
          * Массовая установка атрибутов элемента
          *
          * @param {HTMLElement} element - элемент
-         * @param {Utils.Attrs} attribites - объект атрибутов
+         * @param {Utils.Attrs} attributes - объект атрибутов
          */
-        static setAttributes(element, attribites) {
-            Object.keys(attribites).forEach(function (name) {
-                element.setAttribute(name, attribites[name]);
+        static setAttributes(element, attributes) {
+            Object.keys(attributes).forEach(function (name) {
+                element.setAttribute(name, attributes[name]);
             });
         }
         /**

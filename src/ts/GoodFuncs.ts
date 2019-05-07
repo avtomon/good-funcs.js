@@ -75,8 +75,8 @@ export namespace Utils {
         static addCss(paths : string[], attrs : Attrs = {}) : void {
 
             let cssElements : HTMLLinkElement[] = Array.from(document.querySelectorAll('link[rel="stylesheet"]')),
-                scriptCount : number = cssElements.length,
-                lastCss : HTMLLinkElement = cssElements[scriptCount - 2];
+                cssCount : number = cssElements.length,
+                lastCss : HTMLLinkElement = cssElements[cssCount - 1];
 
             paths.forEach(function (css) {
                 if (document.querySelector(`link[href="${css}"]`)) {
@@ -160,7 +160,11 @@ export namespace Utils {
 
             let ok : boolean = type === 'prev',
                 parent = element.parentNode as HTMLElement,
-                siblings : HTMLElement[] = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter))) as HTMLElement[];
+                siblings : HTMLElement[] = (
+                    !filter
+                    ? Array.from(parent.children)
+                    : Array.from(parent.querySelectorAll(filter))
+                ) as HTMLElement[];
 
             return siblings.filter(function (child) {
 
@@ -405,12 +409,12 @@ export namespace Utils {
          * Массовая установка атрибутов элемента
          *
          * @param {HTMLElement} element - элемент
-         * @param {Utils.Attrs} attribites - объект атрибутов
+         * @param {Utils.Attrs} attributes - объект атрибутов
          */
-        static setAttributes(element : HTMLElement, attribites : Attrs) : void {
+        static setAttributes(element : HTMLElement, attributes : Attrs) : void {
 
-            Object.keys(attribites).forEach(function (name : string) {
-                element.setAttribute(name, attribites[name] as string);
+            Object.keys(attributes).forEach(function (name : string) {
+                element.setAttribute(name, attributes[name] as string);
             })
         }
 

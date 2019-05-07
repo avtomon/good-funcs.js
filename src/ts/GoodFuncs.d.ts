@@ -157,9 +157,9 @@ export declare namespace Utils {
          * Массовая установка атрибутов элемента
          *
          * @param {HTMLElement} element - элемент
-         * @param {Utils.Attrs} attribites - объект атрибутов
+         * @param {Utils.Attrs} attributes - объект атрибутов
          */
-        static setAttributes(element: HTMLElement, attribites: Attrs): void;
+        static setAttributes(element: HTMLElement, attributes: Attrs): void;
         /**
          * Переключение свойств HTML-элементов
          *
