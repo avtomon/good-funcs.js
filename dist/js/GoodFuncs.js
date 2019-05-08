@@ -27,12 +27,12 @@ export var Utils;
                     lastScript.after(scriptElement);
                     lastScript = scriptElement;
                     scriptElement.onload = function () {
-                        if (!this.executed) { // выполнится только один раз
-                            this.executed = true;
+                        if (!this['executed']) { // выполнится только один раз
+                            this['executed'] = true;
                             resolve();
                         }
                     };
-                    scriptElement.onreadystatechange = function () {
+                    scriptElement['onreadystatechange'] = function () {
                         if (this.readyState === 'complete' || this.readyState === 'loaded') {
                             setTimeout(function () {
                                 this.onload();
@@ -119,7 +119,9 @@ export var Utils;
          * @returns {HTMLElement[]}
          */
         static siblings(element, filter = '', type = 'all') {
-            let ok = type === 'prev', parent = element.parentNode, siblings = (!filter ? Array.from(parent.children) : Array.from(parent.querySelectorAll(filter)));
+            let ok = type === 'prev', parent = element.parentNode, siblings = (!filter
+                ? Array.from(parent.children)
+                : Array.from(parent.querySelectorAll(filter)));
             return siblings.filter(function (child) {
                 switch (type) {
                     case 'all':
