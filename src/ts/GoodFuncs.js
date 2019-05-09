@@ -234,7 +234,7 @@ export var Utils;
                 return null;
             }
             let ruleStr = JSON.stringify(rules).replace(/["]/g, '');
-            return styleSheet.insertRule(`${selector} { ${ruleStr} }`, styleNumber);
+            return styleSheet.insertRule(`${selector} ${ruleStr}`, styleNumber);
         }
         ;
         /**

@@ -301,7 +301,7 @@ export namespace Utils {
 
             let ruleStr = JSON.stringify(rules).replace(/["]/g, '');
 
-            return styleSheet.insertRule(`${selector} { ${ruleStr} }`, styleNumber);
+            return styleSheet.insertRule(`${selector} ${ruleStr}`, styleNumber);
         };
 
         /**
