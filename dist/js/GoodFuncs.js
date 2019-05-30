@@ -361,11 +361,42 @@ export var Utils;
          *
          * @param {HTMLElement} element - проверяемый элемент
          * @param {boolean} strict - использовать строгий режим
-         * ы
+         *
          * @returns {boolean}
          */
         static isVisible(element, strict = false) {
             return strict ? window.getComputedStyle(element).display !== 'none' : element.offsetParent !== null;
+        }
+        /**
+         * Числовой хэш запроса
+         *
+         * @param {string} url
+         * @param {Object} params
+         *
+         * @returns {number}
+         */
+        static requestHash(url, params = {}) {
+            let hash = 0, i, chr;
+            if (url.length === 0) {
+                return hash;
+            }
+            let urlObject = new URL(url, window.location.origin);
+            Object.keys(params).forEach(function (key) {
+                if (Array.isArray(params[key])) {
+                    for (let index in params[key]) {
+                        urlObject.searchParams.append(key, params[key][index]);
+                    }
+                    return;
+                }
+                urlObject.searchParams.append(key, params[key]);
+            });
+            const urlString = urlObject.toString();
+            for (i = 0; i < urlString.length; i++) {
+                chr = urlString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
+                hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
         }
     }
     Utils.GoodFuncs = GoodFuncs;

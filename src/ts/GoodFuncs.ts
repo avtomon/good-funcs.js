@@ -46,16 +46,16 @@ export namespace Utils {
                     let scriptElement : HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
                     lastScript.after(scriptElement);
                     lastScript = scriptElement;
-                    scriptElement.onload = function() {
+                    scriptElement.onload = function () {
                         if (!this['executed']) { // выполнится только один раз
                             this['executed'] = true;
                             resolve();
                         }
                     };
 
-                    scriptElement['onreadystatechange'] = function() {
+                    scriptElement['onreadystatechange'] = function () {
                         if (this.readyState === 'complete' || this.readyState === 'loaded') {
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 this.onload()
                             }.bind(this), 0); // сохранить "this" для onload
                         }
@@ -163,8 +163,8 @@ export namespace Utils {
                 parent = element.parentNode as HTMLElement,
                 siblings : HTMLElement[] = (
                     !filter
-                    ? Array.from(parent.children)
-                    : Array.from(parent.querySelectorAll(filter))
+                        ? Array.from(parent.children)
+                        : Array.from(parent.querySelectorAll(filter))
                 ) as HTMLElement[];
 
             return siblings.filter(function (child) {
@@ -453,11 +453,49 @@ export namespace Utils {
          *
          * @param {HTMLElement} element - проверяемый элемент
          * @param {boolean} strict - использовать строгий режим
-         * ы
+         *
          * @returns {boolean}
          */
         static isVisible(element : HTMLElement, strict : boolean = false) : boolean {
             return strict ? window.getComputedStyle(element).display !== 'none' : element.offsetParent !== null;
+        }
+
+        /**
+         * Числовой хэш запроса
+         *
+         * @param {string} url
+         * @param {Object} params
+         *
+         * @returns {number}
+         */
+        static requestHash(url : string, params : Object = {}) : number {
+            let hash = 0, i, chr;
+            if (url.length === 0) {
+                return hash;
+            }
+
+            let urlObject = new URL(url, window.location.origin);
+
+            Object.keys(params).forEach(function (key) {
+                if (Array.isArray(params[key])) {
+                    for (let index in params[key]) {
+                        urlObject.searchParams.append(key, params[key][index]);
+                    }
+
+                    return;
+                }
+
+                urlObject.searchParams.append(key, params[key])
+            });
+
+            const urlString = urlObject.toString();
+            for (i = 0; i < urlString.length; i++) {
+                chr = urlString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
+                hash |= 0; // Convert to 32bit integer
+            }
+
+            return hash;
         }
     }
 }

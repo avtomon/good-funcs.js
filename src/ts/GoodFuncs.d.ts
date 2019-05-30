@@ -181,9 +181,18 @@ export declare namespace Utils {
          *
          * @param {HTMLElement} element - проверяемый элемент
          * @param {boolean} strict - использовать строгий режим
-         * ы
+         *
          * @returns {boolean}
          */
         static isVisible(element: HTMLElement, strict?: boolean): boolean;
+        /**
+         * Числовой хэш запроса
+         *
+         * @param {string} url
+         * @param {Object} params
+         *
+         * @returns {number}
+         */
+        static requestHash(url: string, params?: Object): number;
     }
 }
