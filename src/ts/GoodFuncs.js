@@ -176,6 +176,10 @@ export var Utils;
                 if (element.value === '') {
                     return false;
                 }
+                if (['checkbox', 'radio'].includes(element['type'])
+                    && !parent.querySelector(`[name="${element.name}"]:checked`)) {
+                    return false;
+                }
             }
             return true;
         }

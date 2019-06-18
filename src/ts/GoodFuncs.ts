@@ -229,6 +229,12 @@ export namespace Utils {
                 if ((element as Templater.FormElement).value === '') {
                     return false;
                 }
+
+                if (['checkbox', 'radio'].includes(element['type'])
+                    && !parent.querySelector(`[name="${(element as Templater.FormElement).name}"]:checked`)) {
+
+                    return false;
+                }
             }
 
             return true;
