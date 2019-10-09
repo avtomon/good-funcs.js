@@ -405,4 +405,3 @@ export var Utils;
     }
     Utils.GoodFuncs = GoodFuncs;
 })(Utils || (Utils = {}));
-//# sourceMappingURL=GoodFuncs.js.map
