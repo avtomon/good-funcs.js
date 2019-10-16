@@ -78,9 +78,9 @@ export declare namespace Utils {
         /**
          * Проверка элементов форм на пустые обязательные значения
          *
-         * @returns {boolean}
+         * @returns {HTMLElement[]}
          */
-        static checkEmptyVal(parent?: HTMLElement | Document): boolean;
+        static checkEmptyVal(parent?: HTMLElement | Document): HTMLElement[];
         /**
          * Вернуть объект таблицы стилей по имени файла
          *

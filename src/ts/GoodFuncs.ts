@@ -221,23 +221,27 @@ export namespace Utils {
         /**
          * Проверка элементов форм на пустые обязательные значения
          *
-         * @returns {boolean}
+         * @returns {HTMLElement[]}
          */
-        static checkEmptyVal(parent : HTMLElement | Document = document) : boolean {
+        static checkEmptyVal(parent : HTMLElement | Document = document) : HTMLElement[] {
 
-            for (let element of parent.querySelectorAll('input:required, select:required, textarea:required')) {
+            let invalidElements : HTMLElement[] = [];
+            for (let element of Array.from(parent.querySelectorAll(
+                'input:required, select:required, textarea:required'
+            )) as HTMLElement[]) {
                 if ((element as Templater.FormElement).value === '') {
-                    return false;
+                    invalidElements.push(element);
+                    continue;
                 }
 
                 if (['checkbox', 'radio'].includes(element['type'])
                     && !parent.querySelector(`[name="${(element as Templater.FormElement).name}"]:checked`)) {
 
-                    return false;
+                    invalidElements.push(element);
                 }
             }
 
-            return true;
+            return invalidElements;
         };
 
         /**

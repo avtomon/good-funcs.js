@@ -169,19 +169,21 @@ export var Utils;
         /**
          * Проверка элементов форм на пустые обязательные значения
          *
-         * @returns {boolean}
+         * @returns {HTMLElement[]}
          */
         static checkEmptyVal(parent = document) {
-            for (let element of parent.querySelectorAll('input:required, select:required, textarea:required')) {
+            let invalidElements = [];
+            for (let element of Array.from(parent.querySelectorAll('input:required, select:required, textarea:required'))) {
                 if (element.value === '') {
-                    return false;
+                    invalidElements.push(element);
+                    continue;
                 }
                 if (['checkbox', 'radio'].includes(element['type'])
                     && !parent.querySelector(`[name="${element.name}"]:checked`)) {
-                    return false;
+                    invalidElements.push(element);
                 }
             }
-            return true;
+            return invalidElements;
         }
         ;
         /**
