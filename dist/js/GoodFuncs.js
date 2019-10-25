@@ -20,7 +20,7 @@ export var Utils;
                 promises[index] = new Promise(function (resolve) {
                     if (document.querySelector(`script[src="${script}"]`)) {
                         resolve();
-                        return promises;
+                        return;
                     }
                     attrs['src'] = script;
                     let scriptElement = GoodFuncs.createElementWithAttrs('script', attrs);
