@@ -30,8 +30,7 @@ export namespace Utils {
         static getScripts(paths : string[], attrs : Attrs = {}) : Promise<void>[] {
 
             let scriptElements : HTMLScriptElement[] = Array.from(document.getElementsByTagName('script')),
-                scriptCount : number = scriptElements.length,
-                lastScript : HTMLScriptElement = scriptElements[scriptCount - 2];
+                lastScript : HTMLScriptElement = scriptElements[scriptElements.length - 1];
 
             let promises : Promise<void>[] = [];
             paths.forEach(function (script, index) {
@@ -44,7 +43,12 @@ export namespace Utils {
 
                     attrs['src'] = script;
                     let scriptElement : HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
-                    lastScript.after(scriptElement);
+                    if (lastScript) {
+                        lastScript.after(scriptElement);
+                    } else {
+                        document.body.after(scriptElement);
+                    }
+
                     lastScript = scriptElement;
                     scriptElement.onload = function () {
                         if (!this['executed']) { // выполнится только один раз

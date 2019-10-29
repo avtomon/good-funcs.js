@@ -14,7 +14,7 @@ export var Utils;
          * @returns {Promise<void>[]}
          */
         static getScripts(paths, attrs = {}) {
-            let scriptElements = Array.from(document.getElementsByTagName('script')), scriptCount = scriptElements.length, lastScript = scriptElements[scriptCount - 2];
+            let scriptElements = Array.from(document.getElementsByTagName('script')), lastScript = scriptElements[scriptElements.length - 1];
             let promises = [];
             paths.forEach(function (script, index) {
                 promises[index] = new Promise(function (resolve) {
@@ -24,7 +24,12 @@ export var Utils;
                     }
                     attrs['src'] = script;
                     let scriptElement = GoodFuncs.createElementWithAttrs('script', attrs);
-                    lastScript.after(scriptElement);
+                    if (lastScript) {
+                        lastScript.after(scriptElement);
+                    }
+                    else {
+                        document.body.after(scriptElement);
+                    }
                     lastScript = scriptElement;
                     scriptElement.onload = function () {
                         if (!this['executed']) { // выполнится только один раз
