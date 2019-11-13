@@ -409,7 +409,25 @@ export var Utils;
             }
             return hash;
         }
+        /**
+         * Аналог jQuery parents
+         *
+         * @param {HTMLElement} element
+         * @param {string} selector
+         * @returns {HTMLElement[]}
+         */
+        static parents(element, selector) {
+            let elements = [], parent = element, isHaveSelector = selector !== undefined;
+            while ((parent = parent.parentElement) !== null) {
+                if (parent.nodeType !== Node.ELEMENT_NODE) {
+                    continue;
+                }
+                if (!isHaveSelector || parent.matches(selector)) {
+                    elements.push(parent);
+                }
+            }
+            return elements;
+        }
     }
     Utils.GoodFuncs = GoodFuncs;
 })(Utils || (Utils = {}));
-//# sourceMappingURL=GoodFuncs.js.map

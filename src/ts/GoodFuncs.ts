@@ -511,5 +511,30 @@ export namespace Utils {
 
             return hash;
         }
+
+        /**
+         * Аналог jQuery parents
+         *
+         * @param {HTMLElement} element
+         * @param {string} selector
+         * @returns {HTMLElement[]}
+         */
+        static parents(element : HTMLElement, selector : string) {
+            let elements : HTMLElement[] = [],
+                parent = element,
+                isHaveSelector : boolean = selector !== undefined;
+
+            while ((parent = parent.parentElement as HTMLElement) !== null) {
+                if (parent.nodeType !== Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                if (!isHaveSelector || parent.matches(selector)) {
+                    elements.push(parent);
+                }
+            }
+
+            return elements;
+        }
     }
 }

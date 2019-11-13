@@ -194,5 +194,13 @@ export declare namespace Utils {
          * @returns {number}
          */
         static requestHash(url: string, params?: Object): number;
+        /**
+         * Аналог jQuery parents
+         *
+         * @param {HTMLElement} element
+         * @param {string} selector
+         * @returns {HTMLElement[]}
+         */
+        static parents(element: HTMLElement, selector: string): HTMLElement[];
     }
 }
