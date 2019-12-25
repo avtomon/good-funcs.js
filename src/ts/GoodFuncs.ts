@@ -417,7 +417,12 @@ export namespace Utils {
          */
         static getRandomString(symbolCount : number) : string {
 
-            return Math.random().toString(36).substring(2, symbolCount);
+            let str : string = '';
+            for (let i = 0; i < 5; i++) {
+                str += Math.random().toString(36).substring(2);
+            }
+
+            return str.substring(0, symbolCount);
         }
 
         /**

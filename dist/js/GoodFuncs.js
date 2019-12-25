@@ -331,7 +331,11 @@ export var Utils;
          * @returns {string}
          */
         static getRandomString(symbolCount) {
-            return Math.random().toString(36).substring(2, symbolCount);
+            let str = '';
+            for (let i = 0; i < 5; i++) {
+                str += Math.random().toString(36).substring(2);
+            }
+            return str.substring(0, symbolCount);
         }
         /**
          * Массовая установка атрибутов элемента
