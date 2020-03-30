@@ -165,20 +165,17 @@ export namespace Utils {
 
             let ok : boolean = type === 'prev',
                 parent = element.parentNode as HTMLElement,
-                siblings : HTMLElement[] = (
-                    !filter
-                        ? Array.from(parent.children)
-                        : Array.from(parent.querySelectorAll(filter))
-                ) as HTMLElement[];
+                siblings : HTMLElement[] = Array.from(parent.children) as HTMLElement[];
 
             return siblings.filter(function (child) {
 
                 switch (type) {
                     case 'all':
-                        ok = true;
+                        ok = filter ? child.matches(filter) : true;
                         break;
 
                     case 'prev':
+                        ok = filter ? child.matches(filter) : true;
                         if (child === element) {
                             ok = false;
                         }
@@ -189,6 +186,8 @@ export namespace Utils {
                         if (child === element) {
                             ok = true;
                         }
+
+                        ok = filter ? child.matches(filter) : true;
 
                         break;
                 }

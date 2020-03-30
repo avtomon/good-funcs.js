@@ -124,15 +124,14 @@ export var Utils;
          * @returns {HTMLElement[]}
          */
         static siblings(element, filter = '', type = 'all') {
-            let ok = type === 'prev', parent = element.parentNode, siblings = (!filter
-                ? Array.from(parent.children)
-                : Array.from(parent.querySelectorAll(filter)));
+            let ok = type === 'prev', parent = element.parentNode, siblings = Array.from(parent.children);
             return siblings.filter(function (child) {
                 switch (type) {
                     case 'all':
-                        ok = true;
+                        ok = filter ? child.matches(filter) : true;
                         break;
                     case 'prev':
+                        ok = filter ? child.matches(filter) : true;
                         if (child === element) {
                             ok = false;
                         }
@@ -141,6 +140,7 @@ export var Utils;
                         if (child === element) {
                             ok = true;
                         }
+                        ok = filter ? child.matches(filter) : true;
                         break;
                 }
                 return ok && child !== element;
