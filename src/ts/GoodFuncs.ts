@@ -163,38 +163,39 @@ export namespace Utils {
          */
         static siblings(element : HTMLElement, filter : string = '', type : SiblingsType = 'all') : HTMLElement[] {
 
-            let ok : boolean = type === 'prev',
+            let ok : boolean = (type === 'prev' || type === 'all'),
                 parent = element.parentNode as HTMLElement,
                 siblings : HTMLElement[] = Array.from(parent.children) as HTMLElement[];
 
-            return siblings.filter(function (child) {
-
+            let result : HTMLElement[] = [];
+            for (let child of siblings) {
                 switch (type) {
                     case 'all':
-                        ok = filter ? child.matches(filter) : true;
+                        if (child !== element && (filter ? child.matches(filter) : true)) {
+                            result.push(child);
+                        }
                         break;
 
                     case 'prev':
-                        ok = filter ? child.matches(filter) : true;
                         if (child === element) {
-                            ok = false;
+                            return result;
                         }
 
                         break;
 
                     case 'next':
+                        if (ok && (filter ? child.matches(filter) : true)) {
+                            result.push(child);
+                        }
                         if (child === element) {
                             ok = true;
                         }
 
-                        ok = filter ? child.matches(filter) : true;
-
                         break;
                 }
+            }
 
-
-                return ok && child !== element;
-            });
+            return result;
         };
 
         /**

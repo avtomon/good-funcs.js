@@ -124,27 +124,31 @@ export var Utils;
          * @returns {HTMLElement[]}
          */
         static siblings(element, filter = '', type = 'all') {
-            let ok = type === 'prev', parent = element.parentNode, siblings = Array.from(parent.children);
-            return siblings.filter(function (child) {
+            let ok = (type === 'prev' || type === 'all'), parent = element.parentNode, siblings = Array.from(parent.children);
+            let result = [];
+            for (let child of siblings) {
                 switch (type) {
                     case 'all':
-                        ok = filter ? child.matches(filter) : true;
+                        if (child !== element && (filter ? child.matches(filter) : true)) {
+                            result.push(child);
+                        }
                         break;
                     case 'prev':
-                        ok = filter ? child.matches(filter) : true;
                         if (child === element) {
-                            ok = false;
+                            return result;
                         }
                         break;
                     case 'next':
+                        if (ok && (filter ? child.matches(filter) : true)) {
+                            result.push(child);
+                        }
                         if (child === element) {
                             ok = true;
                         }
-                        ok = filter ? child.matches(filter) : true;
                         break;
                 }
-                return ok && child !== element;
-            });
+            }
+            return result;
         }
         ;
         /**
