@@ -33,15 +33,22 @@ export namespace Utils {
                 lastScript : HTMLScriptElement = scriptElements[scriptElements.length - 1];
 
             let promises : Promise<void>[] = [];
-            paths.forEach(function (script, index) {
+            paths.forEach(function (script : string, index : number) {
                 promises[index] = new Promise<void>(function (resolve) {
 
-                    if (document.querySelector(`script[src="${script}"]`)) {
+                    let presentScript = document.querySelector(`script[src="${script}"]`);
+                    if (presentScript
+                        && (
+                            (presentScript.hasAttribute('executed') && presentScript.getAttribute('executed') === 'true')
+                            || !presentScript.hasAttribute('executed')
+                        )
+                    ) {
                         resolve();
                         return;
                     }
 
                     attrs['src'] = script;
+                    attrs['executed'] = 'false';
                     let scriptElement : HTMLScriptElement = GoodFuncs.createElementWithAttrs('script', attrs) as HTMLScriptElement;
                     if (lastScript) {
                         lastScript.after(scriptElement);
@@ -50,9 +57,10 @@ export namespace Utils {
                     }
 
                     lastScript = scriptElement;
-                    scriptElement.onload = function () {
+                    scriptElement.onload = function (this : HTMLScriptElement) {
                         if (!this['executed']) { // выполнится только один раз
                             this['executed'] = true;
+                            this.setAttribute('executed', 'true');
                             resolve();
                         }
                     };

@@ -18,11 +18,15 @@ export var Utils;
             let promises = [];
             paths.forEach(function (script, index) {
                 promises[index] = new Promise(function (resolve) {
-                    if (document.querySelector(`script[src="${script}"]`)) {
+                    let presentScript = document.querySelector(`script[src="${script}"]`);
+                    if (presentScript
+                        && ((presentScript.hasAttribute('executed') && presentScript.getAttribute('executed') === 'true')
+                            || !presentScript.hasAttribute('executed'))) {
                         resolve();
                         return;
                     }
                     attrs['src'] = script;
+                    attrs['executed'] = 'false';
                     let scriptElement = GoodFuncs.createElementWithAttrs('script', attrs);
                     if (lastScript) {
                         lastScript.after(scriptElement);
@@ -34,6 +38,7 @@ export var Utils;
                     scriptElement.onload = function () {
                         if (!this['executed']) { // выполнится только один раз
                             this['executed'] = true;
+                            this.setAttribute('executed', 'true');
                             resolve();
                         }
                     };
