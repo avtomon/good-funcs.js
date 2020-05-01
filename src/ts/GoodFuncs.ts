@@ -189,6 +189,10 @@ export namespace Utils {
                             return result;
                         }
 
+                        if (filter ? child.matches(filter) : true) {
+                            result.push(child);
+                        }
+
                         break;
 
                     case 'next':

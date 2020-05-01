@@ -142,6 +142,9 @@ export var Utils;
                         if (child === element) {
                             return result;
                         }
+                        if (filter ? child.matches(filter) : true) {
+                            result.push(child);
+                        }
                         break;
                     case 'next':
                         if (ok && (filter ? child.matches(filter) : true)) {
