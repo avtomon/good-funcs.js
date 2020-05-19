@@ -18,15 +18,11 @@ export var Utils;
             let promises = [];
             paths.forEach(function (script, index) {
                 promises[index] = new Promise(function (resolve) {
-                    let presentScript = document.querySelector(`script[src="${script}"]`);
-                    if (presentScript
-                        && ((presentScript.hasAttribute('executed') && presentScript.getAttribute('executed') === 'true')
-                            || !presentScript.hasAttribute('executed'))) {
+                    if (document.querySelector(`script[src="${script}"]`)) {
                         resolve();
                         return;
                     }
                     attrs['src'] = script;
-                    attrs['executed'] = 'false';
                     let scriptElement = GoodFuncs.createElementWithAttrs('script', attrs);
                     if (lastScript) {
                         lastScript.after(scriptElement);
@@ -38,7 +34,6 @@ export var Utils;
                     scriptElement.onload = function () {
                         if (!this['executed']) { // выполнится только один раз
                             this['executed'] = true;
-                            this.setAttribute('executed', 'true');
                             resolve();
                         }
                     };
@@ -129,34 +124,27 @@ export var Utils;
          * @returns {HTMLElement[]}
          */
         static siblings(element, filter = '', type = 'all') {
-            let ok = (type === 'prev' || type === 'all'), parent = element.parentNode, siblings = Array.from(parent.children);
-            let result = [];
-            for (let child of siblings) {
+            let ok = type === 'prev', parent = element.parentNode, siblings = Array.from(parent.children);
+            return siblings.filter(function (child) {
                 switch (type) {
                     case 'all':
-                        if (child !== element && (filter ? child.matches(filter) : true)) {
-                            result.push(child);
-                        }
+                        ok = filter ? child.matches(filter) : true;
                         break;
                     case 'prev':
+                        ok = filter ? child.matches(filter) : true;
                         if (child === element) {
-                            return result;
-                        }
-                        if (filter ? child.matches(filter) : true) {
-                            result.push(child);
+                            ok = false;
                         }
                         break;
                     case 'next':
-                        if (ok && (filter ? child.matches(filter) : true)) {
-                            result.push(child);
-                        }
                         if (child === element) {
                             ok = true;
                         }
+                        ok = filter ? child.matches(filter) : true;
                         break;
                 }
-            }
-            return result;
+                return ok && child !== element;
+            });
         }
         ;
         /**
